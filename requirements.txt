@@ -1,0 +1,6 @@
+aiogram==2.23.1
+aiogram_broadcaster==0.0.7
+aioschedule==0.5.2
+beautifulsoup4==4.11.1
+openpyxl==3.0.10
+playwright==1.28.0

@@ -1,0 +1,10 @@
+[tg_bot]
+bot_token = ...
+admin_id = ...
+
+[redis]
+;host =
+;port =
+db =
+;password =
+prefix = receipBot
