@@ -1,10 +1,13 @@
 from datetime import datetime
 import asyncio
 import re
-from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
-
 from telegram.utils.receip_parsers.receip_types import ReceipLine, Receip, ReceipParser
+
+from requests_html import AsyncHTMLSession
+from urllib3 import disable_warnings, exceptions
+
+disable_warnings(exceptions.InsecureRequestWarning)
 
 
 class ReceipKazakhtelecom(ReceipParser):
@@ -22,35 +25,31 @@ class ReceipKazakhtelecom(ReceipParser):
         if not self.templateRegEx.match(link):
             raise AssertionError("Link incorrect")
 
-        async with async_playwright() as p:
-            for browser_type in [p.chromium, p.firefox, p.webkit]:
-                browser = await browser_type.launch()
-                page = await browser.new_page()
-                await page.goto(link)
-                text = await page.content()
-                await browser.close()
-                soup = BeautifulSoup(text, 'lxml')
-                currency = ''
-                data = []
-                for row in soup.find('app-ticket-items').contents[2:]:
-                    items = row.div.div.div.contents
-                    if not currency: currency = items[3].string.split()[-1]
-                    data.append(ReceipLine(
-                        int(items[0].string[:-1]),
-                        re.sub(r'\d{5,} ', '', items[1].string),
-                        self.price_parser(items[3].string),
-                        float(items[4].string.replace(',', '.')),
-                        self.price_parser(items[5].string)
-                    ))
-                date = re.search(r'\d{2}\.\d{2}\.\d{4} \d{2}\:\d{2}', soup.find('span', text='Дата').next_sibling)
-                date = datetime.strptime(date.group(), "%d.%m.%Y %H:%M")
-                return Receip(
-                    date,
-                    link,
-                    currency,
-                    self.name,
-                    data
-                )
+        session = AsyncHTMLSession(verify=False)
+        page = await session.get('https://consumer.oofd.kz/ticket/aadb79f8-a8cf-4b02-bc1e-8d8361575bd0')
+        await page.html.arender()
+        soup = BeautifulSoup(page.html.html, 'lxml')
+        currency = ''
+        data = []
+        for row in soup.find('app-ticket-items').contents[2:]:
+            items = row.div.div.div.contents
+            if not currency: currency = items[3].string.split()[-1]
+            data.append(ReceipLine(
+                int(items[0].string[:-1]),
+                re.sub(r'\d{5,} ', '', items[1].string),
+                self.price_parser(items[3].string),
+                float(items[4].string.replace(',', '.')),
+                self.price_parser(items[5].string)
+            ))
+        date = re.search(r'\d{2}\.\d{2}\.\d{4} \d{2}\:\d{2}', soup.find('span', text='Дата').next_sibling)
+        date = datetime.strptime(date.group(), "%d.%m.%Y %H:%M")
+        return Receip(
+            date,
+            link,
+            currency,
+            self.name,
+            data
+        )
 
 
 if __name__ == "__main__":
@@ -65,4 +64,3 @@ if __name__ == "__main__":
           "<code>Дата :: </code> {receip.date}\n"
           "<code>Количество продуктов :: </code> {receip.volume}\n"
           "<code>Ссылка :: </code> {receip.link}\n".format(receip=t))
-    t.save_xlsx()
