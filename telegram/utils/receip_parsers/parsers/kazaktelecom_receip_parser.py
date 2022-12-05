@@ -30,7 +30,7 @@ class ReceipKazakhtelecom(ReceipParser):
             raise AssertionError("Link incorrect")
         reqLink = link.replace('ticket', r'api/tickets/ticket')
         async with aiohttp.ClientSession() as session:
-            async with session.get(reqLink) as resp:
+            async with session.get(reqLink, verify_ssl=False) as resp:
                 ticket = await resp.json()
         currency = '₸'
         data = []

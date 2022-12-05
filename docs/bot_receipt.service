@@ -1,0 +1,15 @@
+[Unit]
+Description=Receipt to XLSX bot
+After=network.target
+
+[Service]
+User=sirne
+Group=sirne
+Type=simple
+WorkingDirectory=/home/sirne/receiptBot
+ExecStart=python3 bot.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
