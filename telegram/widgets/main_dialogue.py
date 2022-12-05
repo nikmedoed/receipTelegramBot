@@ -1,17 +1,24 @@
+import logging
+
 from aiogram import types, Dispatcher, filters
 from telegram.texts import Text
 from ..utils.receip_parsers.receip_types import ReceipParser
 
 
 async def good_link_processing(message: types.Message, parser: ReceipParser):
-    receip = await parser.parse(message.text)
-    await message.reply_document(
-        (
-            Text.main.filename.value.format(receip=receip),
-            receip.save_virtual_xlsx()
-        ),
-        caption=Text.main.your_file.value.format(receip=receip)
-    )
+    err = Text.main.error_parse
+    try:
+        receip = await parser.parse(message.text)
+        err = Text.main.error_file
+        file = receip.save_virtual_xlsx()
+        err = Text.main.error_send
+        await message.reply_document(
+            (Text.main.filename.value.format(receip=receip), file),
+            caption=Text.main.your_file.value.format(receip=receip)
+        )
+    except Exception as error:
+        await message.reply(err)
+        logging.error(error)
 
 
 def processor_generator(parser: ReceipParser):

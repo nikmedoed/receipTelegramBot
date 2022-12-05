@@ -24,6 +24,7 @@ class Receip:
     currency: str
     vendor: str
     items: typing.List[ReceipLine] = dataclasses.field(default_factory=list)
+    extraData: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
 
     @property
     def amount(self) -> float:
@@ -40,6 +41,8 @@ class Receip:
         ws.append(['currency', self.currency])
         ws.append(['date', self.date])
         ws.append(['link', self.link])
+        for kv in self.extraData.items():
+            ws.append(kv)
         ws.append([])
         fields = [field.name for field in dataclasses.fields(ReceipLine)]
         ws.append(fields + ['date'])
@@ -47,25 +50,18 @@ class Receip:
         for item in self.items:
             ws.append([getattr(item, i) for i in fields] + [date])
 
-        # for idx, col in enumerate(ws.columns, 1):
-        #     ws.column_dimensions[get_column_letter(idx)].auto_size = True
-
         cell_widths = {}
         for column in ws:
             for cell in column:
-                if cell.value:  # skip empty cells
-                    if (
-                        str(cell.value)[0] == "="
-                    ):  # skip formulas, often much longer than content
+                if cell.value:
+                    if str(cell.value)[0] == "=":
                         continue
                     cell_widths[cell.column] = max(
                         (cell_widths.get(cell.column, 0), len(str(cell.value)))
                     )
-
         for col, column_width in cell_widths.items():
-            column_width = str(column_width)
+            column_width = str(column_width + 2)
             ws.column_dimensions[get_column_letter(col)].width = column_width
-
         return save_virtual_workbook(wb)
 
 

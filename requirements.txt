@@ -1,7 +1,6 @@
 aiogram==2.23.1
 aiogram_broadcaster==0.0.7
+aiohttp==3.8.1
 aioschedule==0.5.2
-beautifulsoup4==4.11.1
 openpyxl==3.0.10
-requests_html==0.10.0
 urllib3==1.26.13

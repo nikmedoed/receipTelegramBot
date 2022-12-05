@@ -50,6 +50,9 @@ class Main(EnumContent):
                 "_{receip.amount:.0f}"
                 "_{receip.vendor}"
                 ".xlsx")
+    error_parse = ("Не получилось загрузить данные")
+    error_file = ("Не получилось создать файл")
+    error_send = ("Не получилось отправить файл")
 
 
 class CommandsAdmin(EnumContent):
