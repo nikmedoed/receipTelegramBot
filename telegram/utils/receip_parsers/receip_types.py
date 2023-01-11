@@ -23,6 +23,7 @@ class Receip:
     link: str
     currency: str
     vendor: str
+    country: str
     items: typing.List[ReceipLine] = dataclasses.field(default_factory=list)
     extraData: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
 
@@ -68,6 +69,7 @@ class Receip:
 class ReceipParser(ABC):
     templateRegStr: str = ""
     name: str = 'abstract'
+    country: str = '??'
 
     def __init__(self):
         self.templateRegEx = re.compile(self.templateRegStr)

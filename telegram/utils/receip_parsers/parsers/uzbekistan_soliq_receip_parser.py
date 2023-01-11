@@ -12,7 +12,8 @@ disable_warnings(exceptions.InsecureRequestWarning)
 
 class ReceipUzSoliq(ReceipParser):
     templateRegStr = r'(https?:\/\/ofd\.soliq\.uz\/check([?&][trcs]=[UZ\d]+)+)'
-    name = 'UZ – Savdo cheki/Sotuv'
+    name = 'ofd.soliq'
+    country = 'UZ'
 
     async def extract_link(self, message: str) -> str:
         return self.templateRegEx.search(message).group(0)
@@ -55,6 +56,7 @@ class ReceipUzSoliq(ReceipParser):
             link,
             currency,
             self.name,
+            self.country,
             data,
             extra
         )

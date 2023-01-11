@@ -48,6 +48,7 @@ class Main(EnumContent):
     filename = ("{receip.date:%Y-%m-%d}"
                 "_{receip.volume}шт"
                 "_{receip.amount:.0f}"
+                "_{receip.country}"
                 "_{receip.vendor}"
                 ".xlsx")
     error_parse = ("Не получилось загрузить данные")

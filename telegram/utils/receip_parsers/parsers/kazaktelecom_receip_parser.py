@@ -20,7 +20,8 @@ KAZ_EXTRA_FIELDS_TICKET = ['transactionId', 'fiscalId', ]
 
 class ReceipKazakhtelecom(ReceipParser):
     templateRegStr = r'https?:\/\/consumer\.oofd\.kz\/ticket\/[-a-z0-9]+'
-    name = 'KZ – Казахтелеком'
+    name = 'Казахтелеком'
+    country = 'KZ'
 
     async def extract_link(self, message: str) -> str:
         return str(max(self.templateRegEx.findall(message), key=len))
@@ -51,6 +52,7 @@ class ReceipKazakhtelecom(ReceipParser):
             link,
             currency,
             self.name,
+            self.country,
             data,
             extra
         )
