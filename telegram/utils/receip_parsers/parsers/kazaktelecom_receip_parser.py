@@ -20,7 +20,7 @@ KAZ_EXTRA_FIELDS_TICKET = ['transactionId', 'fiscalId', ]
 
 class ReceipKazakhtelecom(ReceipParser):
     templateRegStr = r'https?:\/\/consumer\.oofd\.kz\/ticket\/[-a-z0-9]+'
-    name = 'Казахтелеком'
+    name = 'KZ – Казахтелеком'
 
     async def extract_link(self, message: str) -> str:
         return str(max(self.templateRegEx.findall(message), key=len))
@@ -32,7 +32,7 @@ class ReceipKazakhtelecom(ReceipParser):
                 ticket = await resp.json()
         currency = '₸'
         data = []
-        for n, item in enumerate(ticket['ticket']['items']):
+        for n, item in enumerate(ticket['ticket']['items'], 1):
             item = item['commodity']
             data.append(ReceipLine(
                 n,
