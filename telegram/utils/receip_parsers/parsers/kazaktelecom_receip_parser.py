@@ -19,15 +19,13 @@ KAZ_EXTRA_FIELDS_TICKET = ['transactionId', 'fiscalId', ]
 
 
 class ReceipKazakhtelecom(ReceipParser):
-    templateRegStr = r'https:\/\/consumer\.oofd\.kz\/ticket\/[-a-z0-9]+'
+    templateRegStr = r'https?:\/\/consumer\.oofd\.kz\/ticket\/[-a-z0-9]+'
     name = 'Казахтелеком'
 
-    def extract_link(self, message: str) -> str:
+    async def extract_link(self, message: str) -> str:
         return str(max(self.templateRegEx.findall(message), key=len))
 
     async def parser(self, link) -> Receip:
-        if not self.templateRegEx.match(link):
-            raise AssertionError("Link incorrect")
         reqLink = link.replace('ticket', r'api/tickets/ticket')
         async with aiohttp.ClientSession() as session:
             async with session.get(reqLink, verify_ssl=False) as resp:
@@ -58,10 +56,27 @@ class ReceipKazakhtelecom(ReceipParser):
         )
 
 
+class ReceipKazakhtelecomRaw(ReceipKazakhtelecom):
+    templateRegStr = r'(https?:\/\/consumer\.oofd\.kz\/([?&][ifst]=[\d.T]+)+)'
+
+    async def extract_link(self, message: str) -> str:
+        reqLink = self.templateRegEx.search(message).group(0)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(reqLink, verify_ssl=False) as resp:
+                ticket = resp.real_url
+        return ticket.human_repr()
+
+
 if __name__ == "__main__":
-    t = ReceipKazakhtelecom()
-    link = 'Казахтелеком\nhttps://consumer.oofd.kz/ticket/aadb79f8-a8cf-4b02-bc1e-8d8361575bd0'
-    link = max(t.templateRegEx.findall(link), key=len)
-    receip = asyncio.get_event_loop().run_until_complete(t.parser(link))
-    print(Text.Text.main.your_file.value.format(receip=receip))
-    receip.save_virtual_xlsx()
+    pass
+    # link = 'Казахтелеком\nhttp://consumer.oofd.kz/?i=1766359441&f=600300122009&s=193.0&t=20230107T220315'
+    # t = ReceipKazakhtelecomRaw()
+    # link = asyncio.run(t.extract_link(link))
+    # print(link)
+
+    # t = ReceipKazakhtelecom()
+    # link = 'Казахтелеком\nhttps://consumer.oofd.kz/ticket/aadb79f8-a8cf-4b02-bc1e-8d8361575bd0'
+    # link = max(t.templateRegEx.findall(link), key=len)
+    # receip = asyncio.get_event_loop().run_until_complete(t.parser(link))
+    # print(Text.Text.main.your_file.value.format(receip=receip))
+    # receip.save_virtual_xlsx()

@@ -74,19 +74,27 @@ class ReceipParser(ABC):
 
     @staticmethod
     def get_all_vendors():
-        return [i.name for i in ReceipParser.__subclasses__()]
+        return {i.name for i in ReceipParser.parsers()}
 
     @staticmethod
     def parsers():
-        return ReceipParser.__subclasses__()
+        classes = set()
+        work = [ReceipParser]
+        while work:
+            parent = work.pop()
+            for child in parent.__subclasses__():
+                if child not in classes:
+                    classes.add(child)
+                    work.append(child)
+        return classes
 
     @abstractmethod
     async def parser(self, link: str) -> Receip:
         pass
 
     @abstractmethod
-    def extract_link(self, message: str) -> str:
+    async def extract_link(self, message: str) -> str:
         pass
 
     async def parse(self, message: str) -> Receip:
-        return await self.parser(self.extract_link(message))
+        return await self.parser(await self.extract_link(message))
