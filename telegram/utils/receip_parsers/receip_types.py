@@ -76,7 +76,7 @@ class ReceipParser(ABC):
 
     @staticmethod
     def get_all_vendors():
-        return {i.name for i in ReceipParser.parsers()}
+        return {f"{i.country} – {i.name}" for i in ReceipParser.parsers()}
 
     @staticmethod
     def parsers():
