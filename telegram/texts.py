@@ -17,7 +17,7 @@ class General(EnumContent):
                "Можно использовать функцию 'Поделиться' в браузере.\n"
                "\n"
                "На данный момент бот распознаёт чеки следующих вендоров:\n"
-               "- {}\n"
+               "• {}\n"
                "\n"
                "Команды бота:\n"
                "{}\n"
@@ -25,7 +25,7 @@ class General(EnumContent):
                "Если бот работает некорректно, писать @nikmedoed\n\n"
                "<a href='https://gist.github.com/nikmedoed/119abe998466e2c05376768f97363e61'>"
                "Список способов поддержать проекты монетой</a>"
-           ).format('\n- '.join(ReceipParser.get_all_vendors()),
+           ).format('\n• '.join(ReceipParser.get_all_vendors()),
                     '\n'.join([f'/{k.name} - {k}' for k in Commands])),
     privacy = ("Бот хранит только ваш id, чтобы понимать количество пользователей."
                ""),
@@ -41,7 +41,7 @@ class Main(EnumContent):
     your_file = ("<b>Чек распознан</b>\n"
                  "<code>Вендор :: </code> {receip.vendor}\n"
                  "<code>Валюта :: </code> {receip.currency}\n"
-                 "<code>Сумма :: </code> {receip.amount}\n"
+                 "<code>Сумма :: </code> {receip.amount:.2f}\n"
                  "<code>Дата :: </code> {receip.date}\n"
                  "<code>Количество продуктов :: </code> {receip.volume}\n"
                  "<a href='{receip.link}'>Ссылка</a>\n")

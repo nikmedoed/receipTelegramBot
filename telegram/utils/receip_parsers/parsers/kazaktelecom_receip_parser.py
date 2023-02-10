@@ -34,7 +34,9 @@ class ReceipKazakhtelecom(ReceipParser):
         currency = '₸'
         data = []
         for n, item in enumerate(ticket['ticket']['items'], 1):
-            item = item['commodity']
+            item = item.get('commodity')
+            if not item:
+                continue
             data.append(ReceipLine(
                 n,
                 re.sub(r'\d{5,} ', '', item['name']),
